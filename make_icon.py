@@ -63,7 +63,7 @@ def create_icon():
         format='ICO',
         sizes=[(s, s) for s in sizes]
     )
-    print(f'图标已生成: {icon_path}')
+    print(f'Icon created: {icon_path}')
 
 if __name__ == '__main__':
     create_icon()
