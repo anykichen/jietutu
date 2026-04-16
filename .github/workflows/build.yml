@@ -1,0 +1,45 @@
+name: Build EXE
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install PyQt5 pywin32 Pillow pyinstaller
+
+      - name: Generate icon
+        run: python make_icon.py
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --name "SnapFloat截图工具" --icon app.ico --hidden-import win32api --hidden-import win32con --hidden-import win32event --hidden-import winerror --hidden-import winreg --add-data "snapfloat.py;." snapfloat.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SnapFloat截图工具
+          path: dist/SnapFloat截图工具.exe
+
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/SnapFloat截图工具.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
